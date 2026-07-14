@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 1년 수학 학습 돌아보기</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#2e317c; --violet:#6348a0; --violet-soft:#8a76c4;
+  --bg:#f6f5fb; --card:#ffffff; --ink:#26263f; --sub:#6b6a85;
+  --line:#e5e2f0; --accent:#5b4b9e; --accent-weak:#efeaf9;
+  --ok:#2f9e6e; --warn:#c9564f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+/* ---------- 헤더 ---------- */
+.hero{
+  background:linear-gradient(160deg,var(--indigo) 0%,var(--violet) 100%);
+  color:#fff; padding:52px 22px 64px; position:relative; overflow:hidden;
+}
+.hero-inner{max-width:760px;margin:0 auto;position:relative;z-index:2}
+.hero h1{
+  font-family:'Hahmlet',serif; font-weight:700;
+  font-size:clamp(1.7rem,5.4vw,2.5rem); letter-spacing:-.01em; line-height:1.3;
+}
+.hero p.tag{margin-top:12px;color:#d9d3f2;font-size:clamp(.92rem,2.8vw,1.05rem)}
+.hero .notice{
+  margin-top:22px;background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.18); border-radius:12px;
+  padding:14px 16px; font-size:.86rem; color:#e6e1f7;
+}
+.hero .notice b{color:#fff}
+.curve{position:absolute; right:-30px; bottom:-10px; width:min(46vw,380px); opacity:.5; z-index:1}
+/* ---------- 진행바 ---------- */
+.progress-wrap{
+  position:sticky; top:0; z-index:50;
+  background:rgba(246,245,251,.92); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.progress-inner{max-width:760px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:12px}
+.progress-track{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--indigo),var(--violet-soft));border-radius:99px;transition:width .35s ease}
+.progress-label{font-size:.78rem;color:var(--sub);min-width:64px;text-align:right;font-variant-numeric:tabular-nums}
+/* ---------- 본문 ---------- */
+.wrap{max-width:760px;margin:0 auto;padding:34px 18px 90px}
+.section-head{margin:38px 4px 14px;display:flex;align-items:baseline;gap:10px}
+.section-head:first-child{margin-top:6px}
+.eyebrow{
+  font-size:.72rem;font-weight:700;letter-spacing:.14em;color:var(--accent);
+  background:var(--accent-weak);padding:4px 10px;border-radius:99px;white-space:nowrap;
+}
+.section-head h2{font-family:'Hahmlet',serif;font-size:1.15rem;font-weight:600;color:var(--ink)}
+.q{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:22px 20px;margin-bottom:14px;transition:border-color .2s, box-shadow .2s;
+}
+.q.answered{border-color:#cdc3e8}
+.q.error{border-color:var(--warn); box-shadow:0 0 0 3px rgba(201,86,79,.08)}
+.q-title{font-weight:700;font-size:1rem;line-height:1.5}
+.q-title .req{color:var(--warn);margin-left:2px}
+.q-help{font-size:.84rem;color:var(--sub);margin-top:5px}
+.q-help.em{color:var(--accent);font-weight:600}
+.q-body{margin-top:14px}
+.err-msg{display:none;font-size:.8rem;color:var(--warn);margin-top:10px;font-weight:600}
+.q.error .err-msg{display:block}
+/* 입력들 */
+input[type=text], textarea{
+  width:100%;border:1.5px solid var(--line);border-radius:10px;
+  padding:12px 14px;font:inherit;font-size:.95rem;color:var(--ink);
+  background:#fbfaff;transition:border-color .15s;
+}
+input[type=text]:focus, textarea:focus{outline:none;border-color:var(--violet-soft);background:#fff}
+textarea{min-height:120px;resize:vertical}
+.char-hint{font-size:.75rem;color:var(--sub);text-align:right;margin-top:6px}
+/* 선택지 */
+.opt{
+  display:flex;align-items:flex-start;gap:11px;
+  border:1.5px solid var(--line);border-radius:11px;
+  padding:12px 14px;margin-bottom:8px;cursor:pointer;
+  transition:background .12s,border-color .12s; background:#fff;
+  font-size:.93rem;
+}
+.opt:hover{background:#faf8ff}
+.opt input{margin-top:3px;accent-color:var(--accent);width:17px;height:17px;flex-shrink:0;cursor:pointer}
+.opt.checked{border-color:var(--violet-soft);background:var(--accent-weak)}
+.opt.disabled{opacity:.45;pointer-events:none}
+.other-row{display:flex;align-items:center;gap:11px;border:1.5px dashed var(--line);border-radius:11px;padding:10px 14px;margin-bottom:8px;background:#fff}
+.other-row input[type=checkbox]{accent-color:var(--accent);width:17px;height:17px;flex-shrink:0}
+.other-row input[type=text]{border:none;background:transparent;padding:2px 4px;flex:1;font-size:.93rem}
+.other-row input[type=text]:focus{outline:none}
+.other-row.checked{border-color:var(--violet-soft);border-style:solid;background:var(--accent-weak)}
+.limit-note{font-size:.76rem;color:var(--accent);font-weight:600;margin-bottom:10px}
+/* 제출 */
+.submit-area{margin-top:44px;text-align:center}
+.submit-btn{
+  font:inherit;font-weight:700;font-size:1.02rem;color:#fff;
+  background:linear-gradient(135deg,var(--indigo),var(--violet));
+  border:none;border-radius:14px;padding:16px 54px;cursor:pointer;
+  box-shadow:0 8px 24px rgba(70,60,150,.28);
+  transition:transform .15s, box-shadow .15s;
+}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(70,60,150,.34)}
+.submit-btn:disabled{opacity:.6;cursor:wait;transform:none}
+.submit-note{font-size:.8rem;color:var(--sub);margin-top:12px}
+/* 완료 화면 */
+.done{
+  display:none;max-width:560px;margin:0 auto;padding:90px 22px;text-align:center;
+}
+.done .mark{
+  width:74px;height:74px;border-radius:50%;margin:0 auto 22px;
+  background:var(--accent-weak);display:flex;align-items:center;justify-content:center;
+}
+.done h2{font-family:'Hahmlet',serif;font-size:1.5rem;margin-bottom:10px}
+.done p{color:var(--sub);font-size:.95rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:520px){
+  .q{padding:18px 15px}
+  .hero{padding:42px 18px 56px}
+}
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="hero">
+  <svg class="curve" viewBox="0 0 400 300" fill="none" aria-hidden="true">
+    <g stroke="rgba(255,255,255,.35)" stroke-width="1">
+      <path d="M40 20 V280 M100 20 V280 M160 20 V280 M220 20 V280 M280 20 V280 M340 20 V280"/>
+      <path d="M20 40 H380 M20 100 H380 M20 160 H380 M20 220 H380 M20 280 H380"/>
+    </g>
+    <path d="M20 275 Q 210 265 380 40" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>
+  <div class="hero-inner">
+    <h1>나의 1년 수학 학습 돌아보기</h1>
+    <p class="tag">한 해 동안의 수학 학습을 돌아보며, 세부능력 및 특기사항(세특) 작성에 참고할 자료를 모으는 설문입니다.</p>
+    <div class="notice">
+      앞부분은 해당되는 항목을 체크하고, 마지막 세 문항은 직접 작성해주세요. 정직하고 구체적으로 응답할수록 선생님이 여러분의 수업 활동을 사실에 맞게 파악하는 데 도움이 됩니다.<br><br>
+      <b>※ 응답 내용은 세특 작성 참고용으로만 사용하며 성적 산출과는 무관합니다.</b> 교외 활동·수상·자격증·인증시험·사교육 등은 규정상 세특에 기재할 수 없어 참고하지 않습니다.
+    </div>
+  </div>
+</header>
+
+<!-- 진행바 -->
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-inner">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 17</div>
+  </div>
+</div>
+
+<main class="wrap" id="formWrap">
+
+  <!-- ===== 기본 정보 ===== -->
+  <div class="section-head"><span class="eyebrow">기본 정보</span></div>
+
+  <div class="q" data-req="1" data-kind="text" data-entry="entry.1179890016">
+    <div class="q-title">학번<span class="req">*</span></div>
+    <div class="q-help">학년·반·번호를 5자리로 적어주세요. (예) 10305</div>
+    <div class="q-body"><input type="text" inputmode="numeric" maxlength="5" placeholder="10305" data-pattern="^[0-9]{5}$"></div>
+    <div class="err-msg">숫자 5자리로 입력해주세요.</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="text" data-entry="entry.1890087495">
+    <div class="q-title">이름<span class="req">*</span></div>
+    <div class="q-body"><input type="text" placeholder="이름"></div>
+    <div class="err-msg">이름을 입력해주세요.</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="text" data-entry="entry.2095836187">
+    <div class="q-title">관심 분야 또는 진로<span class="req">*</span></div>
+    <div class="q-help">아직 정하지 않았다면 "아직 탐색 중"이라고 적어도 됩니다.</div>
+    <div class="q-body"><input type="text" placeholder="예: 기계공학 / 아직 탐색 중"></div>
+    <div class="err-msg">한 단어라도 적어주세요.</div>
+  </div>
+
+  <!-- ===== 관찰: 나의 수업 모습 ===== -->
+  <div class="section-head"><span class="eyebrow">나의 수업 모습</span><h2>수업에서 실제로 보인 행동</h2></div>
+
+  <div class="q" data-req="1" data-kind="checkbox" data-max="2" data-entry="entry.282726943">
+    <div class="q-title">올해 배운 단원 중 가장 흥미로웠던 단원을 골라주세요. (최대 2개)<span class="req">*</span></div>
+    <div class="q-body">
+      <div class="limit-note">최대 2개까지 선택할 수 있습니다.</div>
+      <label class="opt"><input type="checkbox" value="[공통수학1] 다항식"><span>[공통수학1] 다항식</span></label>
+      <label class="opt"><input type="checkbox" value="[공통수학1] 방정식과 부등식"><span>[공통수학1] 방정식과 부등식</span></label>
+      <label class="opt"><input type="checkbox" value="[공통수학1] 경우의 수"><span>[공통수학1] 경우의 수</span></label>
+      <label class="opt"><input type="checkbox" value="[공통수학1] 행렬"><span>[공통수학1] 행렬</span></label>
+      <label class="opt"><input type="checkbox" value="[공통수학2] 도형의 방정식"><span>[공통수학2] 도형의 방정식</span></label>
+      <label class="opt"><input type="checkbox" value="[공통수학2] 집합과 명제"><span>[공통수학2] 집합과 명제</span></label>
+      <label class="opt"><input type="checkbox" value="[공통수학2] 함수"><span>[공통수학2] 함수</span></label>
+    </div>
+    <div class="err-msg">1개 이상 선택해주세요.</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="checkbox" data-max="2" data-other="1" data-entry="entry.1225105344">
+    <div class="q-title">그 단원이 흥미로웠던 이유로 가장 가까운 것을 골라주세요. (최대 2개)<span class="req">*</span></div>
+    <div class="q-body">
+      <div class="limit-note">최대 2개까지 선택할 수 있습니다.</div>
+      <label class="opt"><input type="checkbox" value="실생활이나 다른 현상과 연결되는 점이 흥미로웠다"><span>실생활이나 다른 현상과 연결되는 점이 흥미로웠다</span></label>
+      <label class="opt"><input type="checkbox" value="논리적으로 명확하게 결론이 도출되는 점이 좋았다"><span>논리적으로 명확하게 결론이 도출되는 점이 좋았다</span></label>
+      <label class="opt"><input type="checkbox" value="그림이나 도형으로 시각화하는 과정이 흥미로웠다"><span>그림이나 도형으로 시각화하는 과정이 흥미로웠다</span></label>
+      <label class="opt"><input type="checkbox" value="한 문제를 여러 방법으로 풀 수 있다는 점이 흥미로웠다"><span>한 문제를 여러 방법으로 풀 수 있다는 점이 흥미로웠다</span></label>
+      <label class="opt"><input type="checkbox" value="어려운 문제를 끝내 해결했을 때의 성취감이 좋았다"><span>어려운 문제를 끝내 해결했을 때의 성취감이 좋았다</span></label>
+      <label class="opt"><input type="checkbox" value="개념들이 서로 연결되는 구조가 흥미로웠다"><span>개념들이 서로 연결되는 구조가 흥미로웠다</span></label>
+      <div class="other-row"><input type="checkbox" class="other-check"><span style="color:var(--sub);font-size:.9rem">기타:</span><input type="text" class="other-text" placeholder="직접 입력"></div>
+    </div>
+    <div class="err-msg">1개 이상 선택해주세요. (기타를 골랐다면 내용도 적어주세요)</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="checkbox" data-other="1" data-entry="entry.1183544096">
+    <div class="q-title">수업 시간에 본인이 실제로 보인 참여 모습을 모두 골라주세요.<span class="req">*</span></div>
+    <div class="q-help">선생님이 실제로 관찰할 수 있었던 모습 위주로 골라주세요.</div>
+    <div class="q-body">
+      <label class="opt"><input type="checkbox" value="궁금한 점이 생기면 질문했다"><span>궁금한 점이 생기면 질문했다</span></label>
+      <label class="opt"><input type="checkbox" value="교사의 발문에 답하거나 호응했다"><span>교사의 발문에 답하거나 호응했다</span></label>
+      <label class="opt"><input type="checkbox" value="자신의 풀이나 생각을 이야기했다"><span>자신의 풀이나 생각을 이야기했다</span></label>
+      <label class="opt"><input type="checkbox" value="기회가 있을 때 나와서 문제풀이를 설명했다"><span>기회가 있을 때 나와서 문제풀이를 설명했다</span></label>
+      <label class="opt"><input type="checkbox" value="친구가 모르는 부분을 옆에서 알려줬다"><span>친구가 모르는 부분을 옆에서 알려줬다</span></label>
+      <label class="opt"><input type="checkbox" value="조용히 집중하며 꾸준히 필기하고 참여했다"><span>조용히 집중하며 꾸준히 필기하고 참여했다</span></label>
+      <div class="other-row"><input type="checkbox" class="other-check"><span style="color:var(--sub);font-size:.9rem">기타:</span><input type="text" class="other-text" placeholder="직접 입력"></div>
+    </div>
+    <div class="err-msg">1개 이상 선택해주세요. (기타를 골랐다면 내용도 적어주세요)</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="radio" data-entry="entry.1908488671">
+    <div class="q-title">올해 수학 과목부장(공통수학 부장)을 맡았나요?<span class="req">*</span></div>
+    <div class="q-body">
+      <label class="opt"><input type="radio" name="r1908488671" value="예"><span>예</span></label>
+      <label class="opt"><input type="radio" name="r1908488671" value="아니오"><span>아니오</span></label>
+    </div>
+    <div class="err-msg">하나를 선택해주세요.</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="radio" data-entry="entry.1027285294">
+    <div class="q-title">수학 시간에 자발적으로 나와 문제풀이를 발표한 정도를 골라주세요.<span class="req">*</span></div>
+    <div class="q-body">
+      <label class="opt"><input type="radio" name="r1027285294" value="여러 차례 자원하여 발표했다"><span>여러 차례 자원하여 발표했다</span></label>
+      <label class="opt"><input type="radio" name="r1027285294" value="한두 번 자원하여 발표했다"><span>한두 번 자원하여 발표했다</span></label>
+      <label class="opt"><input type="radio" name="r1027285294" value="발표한 적이 없다"><span>발표한 적이 없다</span></label>
+    </div>
+    <div class="err-msg">하나를 선택해주세요.</div>
+  </div>
+
+  <!-- ===== 과정: 나의 공부 과정 ===== -->
+  <div class="section-head"><span class="eyebrow">나의 공부 과정</span><h2>막히고, 틀리고, 다시 나아간 길</h2></div>
+
+  <div class="q" data-req="1" data-kind="checkbox" data-other="1" data-entry="entry.1160493692">
+    <div class="q-title">문제가 잘 안 풀리거나 막혔을 때, 본인이 실제로 하는 행동을 모두 골라주세요.<span class="req">*</span></div>
+    <div class="q-help em">이 문항이 세특에서 가장 중요한 "과정"을 보여줍니다. 솔직하게 골라주세요.</div>
+    <div class="q-body">
+      <label class="opt"><input type="checkbox" value="기초 개념으로 되돌아가 원인을 다시 짚어 본다"><span>기초 개념으로 되돌아가 원인을 다시 짚어 본다</span></label>
+      <label class="opt"><input type="checkbox" value="그림이나 표로 바꾸어 상황을 정리해 본다"><span>그림이나 표로 바꾸어 상황을 정리해 본다</span></label>
+      <label class="opt"><input type="checkbox" value="다른 방법이 없는지 여러 갈래로 시도해 본다"><span>다른 방법이 없는지 여러 갈래로 시도해 본다</span></label>
+      <label class="opt"><input type="checkbox" value="어디서 막혔는지 표시해 두고 끝까지 파고든다"><span>어디서 막혔는지 표시해 두고 끝까지 파고든다</span></label>
+      <label class="opt"><input type="checkbox" value="풀이의 각 단계가 맞는지 스스로 따져 본다"><span>풀이의 각 단계가 맞는지 스스로 따져 본다</span></label>
+      <label class="opt"><input type="checkbox" value="반례를 찾아 성립 여부를 확인해 본다"><span>반례를 찾아 성립 여부를 확인해 본다</span></label>
+      <div class="other-row"><input type="checkbox" class="other-check"><span style="color:var(--sub);font-size:.9rem">기타:</span><input type="text" class="other-text" placeholder="직접 입력"></div>
+    </div>
+    <div class="err-msg">1개 이상 선택해주세요. (기타를 골랐다면 내용도 적어주세요)</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="checkbox" data-other="1" data-entry="entry.1721256279">
+    <div class="q-title">틀린 문제나 실수를 다룰 때, 본인이 실제로 하는 행동을 모두 골라주세요.<span class="req">*</span></div>
+    <div class="q-body">
+      <label class="opt"><input type="checkbox" value="틀린 원인을 스스로 분석하고 다시 풀어 본다"><span>틀린 원인을 스스로 분석하고 다시 풀어 본다</span></label>
+      <label class="opt"><input type="checkbox" value="풀이를 마친 뒤 더 나은 방법이 없었는지 되돌아본다"><span>풀이를 마친 뒤 더 나은 방법이 없었는지 되돌아본다</span></label>
+      <label class="opt"><input type="checkbox" value="실수한 유형을 따로 정리해 반복을 줄이려 한다"><span>실수한 유형을 따로 정리해 반복을 줄이려 한다</span></label>
+      <label class="opt"><input type="checkbox" value="개념을 자신만의 언어로 다시 정리해 둔다"><span>개념을 자신만의 언어로 다시 정리해 둔다</span></label>
+      <label class="opt"><input type="checkbox" value="비슷한 문제를 더 풀어 확실히 익힌다"><span>비슷한 문제를 더 풀어 확실히 익힌다</span></label>
+      <div class="other-row"><input type="checkbox" class="other-check"><span style="color:var(--sub);font-size:.9rem">기타:</span><input type="text" class="other-text" placeholder="직접 입력"></div>
+    </div>
+    <div class="err-msg">1개 이상 선택해주세요. (기타를 골랐다면 내용도 적어주세요)</div>
+  </div>
+
+  <!-- ===== 확장: 배움의 확장 ===== -->
+  <div class="section-head"><span class="eyebrow">배움의 확장</span><h2>수업에서 시작해 더 나아간 경험</h2></div>
+
+  <div class="q" data-req="1" data-kind="checkbox" data-other="1" data-entry="entry.1482238769">
+    <div class="q-title">수업에서 배운 내용을 계기로, 스스로 더 파고들거나 확장해 본 경험을 모두 골라주세요.<span class="req">*</span></div>
+    <div class="q-body">
+      <label class="opt"><input type="checkbox" value="수업에서 다룬 개념이 궁금해 관련 책이나 자료를 찾아봤다"><span>수업에서 다룬 개념이 궁금해 관련 책이나 자료를 찾아봤다</span></label>
+      <label class="opt"><input type="checkbox" value="배운 내용을 다른 문제나 새로운 상황에 적용해 봤다"><span>배운 내용을 다른 문제나 새로운 상황에 적용해 봤다</span></label>
+      <label class="opt"><input type="checkbox" value="수업 중 생긴 의문을 스스로 더 깊이 알아봤다"><span>수업 중 생긴 의문을 스스로 더 깊이 알아봤다</span></label>
+      <label class="opt"><input type="checkbox" value="한 단계 높은 난이도의 문제에 도전해 봤다"><span>한 단계 높은 난이도의 문제에 도전해 봤다</span></label>
+      <label class="opt"><input type="checkbox" value="특별히 없다"><span>특별히 없다</span></label>
+      <div class="other-row"><input type="checkbox" class="other-check"><span style="color:var(--sub);font-size:.9rem">기타:</span><input type="text" class="other-text" placeholder="직접 입력"></div>
+    </div>
+    <div class="err-msg">1개 이상 선택해주세요. (기타를 골랐다면 내용도 적어주세요)</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="checkbox" data-other="1" data-entry="entry.1590103181">
+    <div class="q-title">수학을 다른 것과 연결해 생각해 본 경험을 모두 골라주세요.<span class="req">*</span></div>
+    <div class="q-body">
+      <label class="opt"><input type="checkbox" value="다른 과목(과학·사회 등)과 연결해 생각해 봤다"><span>다른 과목(과학·사회 등)과 연결해 생각해 봤다</span></label>
+      <label class="opt"><input type="checkbox" value="일상생활의 현상과 연결해 봤다"><span>일상생활의 현상과 연결해 봤다</span></label>
+      <label class="opt"><input type="checkbox" value="관심 진로 분야와 연결해 봤다"><span>관심 진로 분야와 연결해 봤다</span></label>
+      <label class="opt"><input type="checkbox" value="단원과 단원의 개념을 서로 이어서 이해해 봤다"><span>단원과 단원의 개념을 서로 이어서 이해해 봤다</span></label>
+      <label class="opt"><input type="checkbox" value="특별히 없다"><span>특별히 없다</span></label>
+      <div class="other-row"><input type="checkbox" class="other-check"><span style="color:var(--sub);font-size:.9rem">기타:</span><input type="text" class="other-text" placeholder="직접 입력"></div>
+    </div>
+    <div class="err-msg">1개 이상 선택해주세요. (기타를 골랐다면 내용도 적어주세요)</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="checkbox" data-other="1" data-entry="entry.1131991154">
+    <div class="q-title">학급이나 친구들을 위해 한 역할이 있다면 모두 골라주세요.<span class="req">*</span></div>
+    <div class="q-body">
+      <label class="opt"><input type="checkbox" value="자신의 풀이나 배운 내용을 친구들과 공유했다"><span>자신의 풀이나 배운 내용을 친구들과 공유했다</span></label>
+      <label class="opt"><input type="checkbox" value="좋은 질문이나 의견으로 수업 분위기에 기여했다"><span>좋은 질문이나 의견으로 수업 분위기에 기여했다</span></label>
+      <label class="opt"><input type="checkbox" value="어려워하는 친구에게 먼저 다가가 알려줬다(멘토링)"><span>어려워하는 친구에게 먼저 다가가 알려줬다(멘토링)</span></label>
+      <label class="opt"><input type="checkbox" value="친구들을 격려해 긍정적인 분위기를 만들었다"><span>친구들을 격려해 긍정적인 분위기를 만들었다</span></label>
+      <label class="opt"><input type="checkbox" value="특별히 없다"><span>특별히 없다</span></label>
+      <div class="other-row"><input type="checkbox" class="other-check"><span style="color:var(--sub);font-size:.9rem">기타:</span><input type="text" class="other-text" placeholder="직접 입력"></div>
+    </div>
+    <div class="err-msg">1개 이상 선택해주세요. (기타를 골랐다면 내용도 적어주세요)</div>
+  </div>
+
+  <!-- ===== 성장 ===== -->
+  <div class="section-head"><span class="eyebrow">한 해의 성장</span><h2>1년을 지나 달라진 나</h2></div>
+
+  <div class="q" data-req="1" data-kind="radio" data-entry="entry.1819323859">
+    <div class="q-title">올해 배운 단원 중 가장 어려웠던 단원을 하나 골라주세요.<span class="req">*</span></div>
+    <div class="q-body">
+      <label class="opt"><input type="radio" name="r1819323859" value="[공통수학1] 다항식"><span>[공통수학1] 다항식</span></label>
+      <label class="opt"><input type="radio" name="r1819323859" value="[공통수학1] 방정식과 부등식"><span>[공통수학1] 방정식과 부등식</span></label>
+      <label class="opt"><input type="radio" name="r1819323859" value="[공통수학1] 경우의 수"><span>[공통수학1] 경우의 수</span></label>
+      <label class="opt"><input type="radio" name="r1819323859" value="[공통수학1] 행렬"><span>[공통수학1] 행렬</span></label>
+      <label class="opt"><input type="radio" name="r1819323859" value="[공통수학2] 도형의 방정식"><span>[공통수학2] 도형의 방정식</span></label>
+      <label class="opt"><input type="radio" name="r1819323859" value="[공통수학2] 집합과 명제"><span>[공통수학2] 집합과 명제</span></label>
+      <label class="opt"><input type="radio" name="r1819323859" value="[공통수학2] 함수"><span>[공통수학2] 함수</span></label>
+    </div>
+    <div class="err-msg">하나를 선택해주세요.</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="checkbox" data-max="2" data-other="1" data-entry="entry.1312419368">
+    <div class="q-title">1년 전과 비교해 가장 크게 달라진 점을 골라주세요. (최대 2개)<span class="req">*</span></div>
+    <div class="q-body">
+      <div class="limit-note">최대 2개까지 선택할 수 있습니다.</div>
+      <label class="opt"><input type="checkbox" value="어려운 문제도 끈기 있게 도전하게 되었다"><span>어려운 문제도 끈기 있게 도전하게 되었다</span></label>
+      <label class="opt"><input type="checkbox" value="논리적이고 단계적으로 사고하게 되었다"><span>논리적이고 단계적으로 사고하게 되었다</span></label>
+      <label class="opt"><input type="checkbox" value="실수의 원인을 점검하는 습관이 생겼다"><span>실수의 원인을 점검하는 습관이 생겼다</span></label>
+      <label class="opt"><input type="checkbox" value="개념들을 큰 틀로 연결해 이해하게 되었다"><span>개념들을 큰 틀로 연결해 이해하게 되었다</span></label>
+      <label class="opt"><input type="checkbox" value="질문이나 발표에 대한 두려움이 줄었다"><span>질문이나 발표에 대한 두려움이 줄었다</span></label>
+      <label class="opt"><input type="checkbox" value="수학에 대한 흥미나 자신감이 생겼다"><span>수학에 대한 흥미나 자신감이 생겼다</span></label>
+      <div class="other-row"><input type="checkbox" class="other-check"><span style="color:var(--sub);font-size:.9rem">기타:</span><input type="text" class="other-text" placeholder="직접 입력"></div>
+    </div>
+    <div class="err-msg">1개 이상 선택해주세요. (기타를 골랐다면 내용도 적어주세요)</div>
+  </div>
+
+  <!-- ===== 직접 작성 ===== -->
+  <div class="section-head"><span class="eyebrow">직접 쓰는 이야기</span><h2>결과보다 "무엇을, 어떻게, 왜"</h2></div>
+
+  <div class="q" data-req="1" data-kind="textarea" data-min="30" data-entry="entry.345143965">
+    <div class="q-title">올해 수학 수업이나 공부에서, 한 문제나 한 주제를 오래 붙들고 파고든 경험을 적어주세요.<span class="req">*</span></div>
+    <div class="q-help">무엇이 궁금했고, 어떻게 접근했으며, 그 과정에서 무엇을 깨달았는지 순서대로 써주세요. (탐구 보고서나 수행평가로 낸 것 말고, 스스로 한 경험 위주로. 최소 두 문장)</div>
+    <div class="q-body">
+      <textarea placeholder="예: 도형의 방정식 단원에서 ..."></textarea>
+      <div class="char-hint"><span class="cnt">0</span>자</div>
+    </div>
+    <div class="err-msg">조금 더 구체적으로 적어주세요. (30자 이상)</div>
+  </div>
+
+  <div class="q" data-req="1" data-kind="textarea" data-min="30" data-entry="entry.871673405">
+    <div class="q-title">가장 어려웠던 단원에서, 그 개념을 익히기 위해 스스로 어떤 노력을 했나요?<span class="req">*</span></div>
+    <div class="q-help">막혔던 지점과, 그것을 넘기 위해 시도한 방법, 그 결과를 함께 적어주세요. (최소 두 문장)</div>
+    <div class="q-body">
+      <textarea placeholder="예: 처음에는 ... 그래서 ... 그 결과 ..."></textarea>
+      <div class="char-hint"><span class="cnt">0</span>자</div>
+    </div>
+    <div class="err-msg">조금 더 구체적으로 적어주세요. (30자 이상)</div>
+  </div>
+
+  <div class="q" data-req="0" data-kind="textarea" data-entry="entry.527010821">
+    <div class="q-title">수업과 관련하여, 세특 작성 시 선생님이 참고했으면 하는 점이 있다면 자유롭게 적어주세요. (선택)</div>
+    <div class="q-help">단, 교외 활동·수상·자격증·인증시험 등은 규정상 세특에 기재할 수 없어 수업 안에서의 활동만 참고됩니다.</div>
+    <div class="q-body">
+      <textarea placeholder="자유롭게 적어주세요."></textarea>
+    </div>
+  </div>
+
+  <div class="submit-area">
+    <button class="submit-btn" id="submitBtn">제출하기</button>
+    <div class="submit-note">제출 후에는 수정할 수 없으니 한 번 더 확인해주세요.</div>
+  </div>
+</main>
+
+<!-- 완료 화면 -->
+<div class="done" id="doneScreen">
+  <div class="mark">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M4 12.5 9.5 18 20 6.5" stroke="#5b4b9e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <h2>제출이 완료되었습니다</h2>
+  <p>한 해의 배움을 정성껏 돌아봐 줘서 고맙습니다.<br>응답은 세특 작성 참고 자료로만 활용됩니다.</p>
+</div>
+
+<script>
+(function(){
+  var FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSdM3hnyzfnnxZGsggVwyXEsCVOzFAqnmM7PTc3-qCvAwBPaLA/formResponse';
+  var qs = Array.prototype.slice.call(document.querySelectorAll('.q'));
+  var fill = document.getElementById('progressFill');
+  var label = document.getElementById('progressLabel');
+  var total = qs.filter(function(q){return q.dataset.req==='1';}).length;
+
+  // ----- 상태 판정 -----
+  function textOf(q){ return q.querySelector('input[type=text], textarea'); }
+  function isAnswered(q){
+    var kind = q.dataset.kind;
+    if(kind==='text'){
+      var el = textOf(q), v = el.value.trim();
+      if(!v) return false;
+      var pat = el.dataset.pattern;
+      return pat ? new RegExp(pat).test(v) : true;
+    }
+    if(kind==='textarea'){
+      var t = q.querySelector('textarea').value.trim();
+      var min = parseInt(q.dataset.min||'0',10);
+      return t.length >= (min||1);
+    }
+    if(kind==='radio'){
+      return !!q.querySelector('input[type=radio]:checked');
+    }
+    if(kind==='checkbox'){
+      var checked = q.querySelectorAll('.opt input:checked').length;
+      var oc = q.querySelector('.other-check');
+      var otherOn = oc && oc.checked;
+      var otherTx = q.querySelector('.other-text');
+      if(otherOn && otherTx && !otherTx.value.trim()) return false; // 기타 체크했는데 내용 없음
+      return checked > 0 || (otherOn && otherTx.value.trim().length>0);
+    }
+    return false;
+  }
+  function refresh(){
+    var done = 0;
+    qs.forEach(function(q){
+      var ok = isAnswered(q);
+      q.classList.toggle('answered', ok);
+      if(ok) q.classList.remove('error');
+      if(q.dataset.req==='1' && ok) done++;
+      // 선택 스타일
+      q.querySelectorAll('.opt').forEach(function(o){
+        var i=o.querySelector('input');
+        o.classList.toggle('checked', i.checked);
+      });
+      var orow=q.querySelector('.other-row');
+      if(orow){ orow.classList.toggle('checked', orow.querySelector('.other-check').checked); }
+    });
+    fill.style.width = (done/total*100)+'%';
+    label.textContent = done+' / '+total;
+  }
+
+  // ----- 최대 2개 제한 -----
+  function enforceMax(q){
+    var max = parseInt(q.dataset.max||'0',10);
+    if(!max) return;
+    var boxes = q.querySelectorAll('.opt input[type=checkbox], .other-check');
+    var n = q.querySelectorAll('.opt input:checked').length + (q.querySelector('.other-check')&&q.querySelector('.other-check').checked?1:0);
+    boxes.forEach(function(b){
+      var wrap = b.closest('.opt')||b.closest('.other-row');
+      if(!b.checked && n>=max){ wrap.classList.add('disabled'); }
+      else{ wrap.classList.remove('disabled'); }
+    });
+  }
+
+  // ----- 이벤트 -----
+  qs.forEach(function(q){
+    q.addEventListener('input', function(){ enforceMax(q); refresh(); });
+    q.addEventListener('change', function(){ enforceMax(q); refresh(); });
+    // 기타 텍스트 입력 시 체크 자동
+    var otx = q.querySelector('.other-text');
+    if(otx){
+      otx.addEventListener('input', function(){
+        var oc=q.querySelector('.other-check');
+        if(otx.value.trim() && !oc.checked){ oc.checked=true; enforceMax(q); }
+        refresh();
+      });
+    }
+    // 글자수
+    var ta=q.querySelector('textarea'), cnt=q.querySelector('.cnt');
+    if(ta&&cnt){ ta.addEventListener('input',function(){cnt.textContent=ta.value.trim().length;}); }
+  });
+
+  // ----- 제출 -----
+  document.getElementById('submitBtn').addEventListener('click', function(){
+    var firstErr = null;
+    qs.forEach(function(q){
+      if(q.dataset.req==='1' && !isAnswered(q)){
+        q.classList.add('error');
+        if(!firstErr) firstErr = q;
+      }
+    });
+    if(firstErr){
+      firstErr.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    var btn=this; btn.disabled=true; btn.textContent='제출 중...';
+
+    var body = new URLSearchParams();
+    qs.forEach(function(q){
+      var entry=q.dataset.entry, kind=q.dataset.kind;
+      if(kind==='text'){ var v=textOf(q).value.trim(); if(v) body.append(entry,v); }
+      else if(kind==='textarea'){ var t=q.querySelector('textarea').value.trim(); if(t) body.append(entry,t); }
+      else if(kind==='radio'){ var r=q.querySelector('input[type=radio]:checked'); if(r) body.append(entry,r.value); }
+      else if(kind==='checkbox'){
+        q.querySelectorAll('.opt input:checked').forEach(function(c){ body.append(entry,c.value); });
+        var oc=q.querySelector('.other-check'), otx=q.querySelector('.other-text');
+        if(oc&&oc.checked&&otx&&otx.value.trim()){
+          body.append(entry,'__other_option__');
+          body.append(entry+'.other_option_response', otx.value.trim());
+        }
+      }
+    });
+
+    fetch(FORM_ACTION, {method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:body.toString()
+    }).then(finish).catch(finish);
+
+    function finish(){
+      document.getElementById('formWrap').style.display='none';
+      document.getElementById('progressWrap').style.display='none';
+      document.querySelector('.hero').style.display='none';
+      document.getElementById('doneScreen').style.display='block';
+      window.scrollTo({top:0});
+    }
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>
